@@ -5,6 +5,7 @@ import com.assignment.model.enums.CarType;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 /**
  * Input DTO for the service /checkIn
@@ -15,6 +16,18 @@ public class CheckinDtoIn {
     @NotNull
     @ApiModelProperty(example = "GASOLINE", required = true)
     private CarType carType;
+
+    @NotNull
+    @ApiModelProperty(example = "2020-10-03T10:15:30", required = true)
+    private LocalDateTime startHour;
+
+    public LocalDateTime getStartHour() {
+        return startHour;
+    }
+
+    public void setStartHour(LocalDateTime startHour) {
+        this.startHour = startHour;
+    }
 
     public CarType getCarType() {
         return carType;

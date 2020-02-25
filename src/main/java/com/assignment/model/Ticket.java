@@ -6,6 +6,9 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Model for the object Ticket used also as DAO
+ */
 @Entity
 @Table(name = "ticket")
 public class Ticket {

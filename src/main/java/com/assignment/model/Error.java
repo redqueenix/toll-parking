@@ -2,6 +2,9 @@ package com.assignment.model;
 
 import com.assignment.model.enums.CodeError;
 
+/**
+ * Model for error returned
+ */
 public class Error {
 
     private CodeError code;

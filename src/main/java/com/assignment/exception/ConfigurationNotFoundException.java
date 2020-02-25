@@ -1,5 +1,5 @@
 package com.assignment.exception;
-import com.assignment.model.Parking
+import com.assignment.model.Parking;
 
 /**
  * Exception thrown when the resource {@link Parking} is not found

@@ -7,6 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Model for the object Parking used also as DAO
+ */
 @Entity
 @Table(name = "parking")
 public class Parking {
@@ -22,11 +25,11 @@ public class Parking {
     private Pricing pricing;
 
     @NotNull
-    @ApiModelProperty(example = "0", required = true)
+    @ApiModelProperty(example = "5", required = true)
     private int gasolineSlots;
 
     @NotNull
-    @ApiModelProperty(example = "0", required = true)
+    @ApiModelProperty(example = "5", required = true)
     private int electric20Slots;
 
     @NotNull

@@ -1,7 +1,9 @@
 package com.assignment.controller;
 
 import com.assignment.dto.*;
+import com.assignment.exception.*;
 import com.assignment.service.ParkingService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +47,7 @@ public class TollParkingController {
             @ApiResponse(code = 500, message = "Internal error")
     })
     @PostMapping(value = "/checkin")
-    public ResponseEntity<CheckinDtoOut> checkIn(@RequestBody @Valid CheckinDtoIn checkinDtoIn) {
+    public ResponseEntity<CheckinDtoOut> checkIn(@RequestBody @Valid CheckinDtoIn checkinDtoIn) throws SlotNotFoundException, ConfigurationNotFoundException {
         CheckinDtoOut checkinDtoOut = parkingService.park(checkinDtoIn);
         return new ResponseEntity<>(checkinDtoOut, HttpStatus.OK);
     }
@@ -58,7 +60,7 @@ public class TollParkingController {
             @ApiResponse(code = 500, message = "Internal error")
     })
     @PostMapping(value = "/checkout")
-    public ResponseEntity<?> checkout(@RequestBody @Valid CheckoutDtoIn checkoutDtoIn) {
+    public ResponseEntity<?> checkout(@RequestBody @Valid CheckoutDtoIn checkoutDtoIn) throws TicketNotFoundException, FunctionalException {
         parkingService.exit(checkoutDtoIn);
         return ResponseEntity.ok("Checkout is done!");
     }
@@ -71,8 +73,8 @@ public class TollParkingController {
             @ApiResponse(code = 500, message = "Internal error")
     })
     @PostMapping(value = "/bill")
-    public ResponseEntity<BillDtoOut> bill(@RequestBody @Valid CheckoutDtoIn checkoutDtoIn) {
-        BillDtoOut billDtoOut = parkingService.bill(checkoutDtoIn);
+    public ResponseEntity<BillDtoOut> bill(@RequestBody @Valid BillDtoIn billDtoIn) throws TicketNotFoundException, PricingNotFoundException, ConfigurationNotFoundException, FunctionalException {
+        BillDtoOut billDtoOut = parkingService.bill(billDtoIn);
         return new ResponseEntity<>(billDtoOut, HttpStatus.OK);
     }
 }

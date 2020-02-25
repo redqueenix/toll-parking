@@ -1,12 +1,15 @@
 package com.assignment.exception;
 
-public class TollParkingException extends RuntimeException{
+/**
+ * Global exception for the application TollParking
+ */
+class TollParkingException extends Exception{
 
-    public TollParkingException(String message) {
+    TollParkingException(String message) {
         super(message);
     }
 
-    public TollParkingException(String message, Throwable cause) {
+    TollParkingException(String message, Throwable cause) {
         super(message, cause);
     }
 }

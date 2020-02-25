@@ -4,37 +4,54 @@ import com.assignment.exception.ConfigurationNotFoundException;
 import com.assignment.exception.PricingNotFoundException;
 import com.assignment.model.Parking;
 import com.assignment.repository.ParkingRepository;
-import com.assignment.service.fixamount.PricingFixAmoutService;
-import com.assignment.service.withoufixamount.PricingWithoutFixAmoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
+/**
+ * Service to manage the pricing of the Poll Parking
+ */
 @Service
-public abstract class PricingService {
-
-    @Autowired
-    private PricingFixAmoutService pricingFixAmoutService;
-    @Autowired
-    private PricingWithoutFixAmoutService pricingWithoutFixAmoutService;
+public class PricingService {
 
     @Autowired
     private ParkingRepository parkingRepository;
 
     private static final int PARKING_ID = 1;
 
-    double calculatePrice(LocalDateTime startHour, LocalDateTime endHour) {
+    /**
+     * Method to orchestrate the different pricing method
+     * @param startHour when the car entered the parking
+     * @param endHour when the car left the parking
+     * @return the billing price
+     */
+    double calculatePrice(LocalDateTime startHour, LocalDateTime endHour) throws ConfigurationNotFoundException, PricingNotFoundException {
         Parking parking = parkingRepository.findById(PARKING_ID).orElseThrow(() -> new ConfigurationNotFoundException("No Parking Initialization Found"));
         double hourPrice = parking.getHourPrice();
         double fixedAmount = parking.getFixedAmount();
         switch (parking.getPricing()) {
             case HOUR_SPENT_ONLY:
-                return pricingFixAmoutService.calculatePrice(hourPrice, startHour, endHour);
+                return calculatePrice(hourPrice, startHour, endHour);
             case FIXED_AMOUNT_PLUS_HOUR_SPENT:
-                return pricingWithoutFixAmoutService.calculatePrice(fixedAmount, hourPrice, startHour, endHour);
+                return calculatePrice(fixedAmount, hourPrice, startHour, endHour);
             default:
                 throw new PricingNotFoundException(String.format("Pricing %s not available", parking.getPricing()));
         }
     }
+
+    private double calculatePrice(double hourPrice, LocalDateTime startHour, LocalDateTime endHour){
+        return hourPrice * hourDuration(startHour, endHour);
+    }
+
+    private double calculatePrice(double fixedAmount, double hourPrice, LocalDateTime startHour, LocalDateTime endHour){
+        return fixedAmount + hourPrice * hourDuration(startHour, endHour);
+    }
+
+    private long hourDuration(LocalDateTime startHour, LocalDateTime endHour){
+        Duration duration = Duration.between(startHour, endHour);
+        return Math.abs(duration.toHours());
+    }
+
 }
