@@ -1,7 +1,12 @@
 package com.assignment.dto;
 
+import com.assignment.controller.TollParkingController;
 import io.swagger.annotations.ApiModelProperty;
 
+/**
+ * Output DTO for the service /checkIn
+ * @see TollParkingController#checkIn(CheckinDtoIn)
+ */
 public class CheckinDtoOut {
 
     @ApiModelProperty(example = "13")
