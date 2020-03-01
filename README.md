@@ -1,4 +1,4 @@
-# toll-parking
+# Toll Parking
 toll-parking is an API for the management of a toll car park.
 
 ## Getting Started
