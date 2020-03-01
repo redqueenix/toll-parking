@@ -5,7 +5,7 @@ toll-parking is an API for the management of a toll car park.
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 ### Prerequisites
 To execute the application you need
-* jdk-11.0.5
+* Java 11
 * Maven
 * IntelliJ (or any preferred IDE)
 
