@@ -4,7 +4,6 @@ import com.assignment.exception.ConfigurationNotFoundException;
 import com.assignment.exception.PricingNotFoundException;
 import com.assignment.model.Parking;
 import com.assignment.repository.ParkingRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -16,10 +15,13 @@ import java.time.LocalDateTime;
 @Service
 public class PricingService {
 
-    @Autowired
-    private ParkingRepository parkingRepository;
+    private final ParkingRepository parkingRepository;
 
     private static final int PARKING_ID = 1;
+
+    public PricingService(ParkingRepository parkingRepository) {
+        this.parkingRepository = parkingRepository;
+    }
 
     /**
      * Method to orchestrate the different pricing method
@@ -27,7 +29,7 @@ public class PricingService {
      * @param endHour when the car left the parking
      * @return the billing price
      */
-    double calculatePrice(LocalDateTime startHour, LocalDateTime endHour) throws ConfigurationNotFoundException, PricingNotFoundException {
+    public double calculatePrice(LocalDateTime startHour, LocalDateTime endHour) throws ConfigurationNotFoundException, PricingNotFoundException {
         Parking parking = parkingRepository.findById(PARKING_ID).orElseThrow(() -> new ConfigurationNotFoundException("No Parking Initialization Found"));
         double hourPrice = parking.getHourPrice();
         double fixedAmount = parking.getFixedAmount();

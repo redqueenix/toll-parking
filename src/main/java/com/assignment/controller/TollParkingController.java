@@ -60,7 +60,7 @@ public class TollParkingController {
             @ApiResponse(code = 500, message = "Internal error")
     })
     @PostMapping(value = "/checkout")
-    public ResponseEntity<?> checkout(@RequestBody @Valid CheckoutDtoIn checkoutDtoIn) throws TicketNotFoundException, FunctionalException {
+    public ResponseEntity<?> checkout(@RequestBody @Valid CheckoutDtoIn checkoutDtoIn) throws TicketNotFoundException, FunctionalException, ConfigurationNotFoundException {
         parkingService.exit(checkoutDtoIn);
         return ResponseEntity.ok("Checkout is done!");
     }

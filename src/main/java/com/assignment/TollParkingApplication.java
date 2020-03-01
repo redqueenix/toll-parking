@@ -12,4 +12,6 @@ public class TollParkingApplication {
     public static void main(String[] args) {
         SpringApplication.run(TollParkingApplication.class, args);
     }
+
+
 }

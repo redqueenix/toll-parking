@@ -4,6 +4,7 @@ import com.assignment.dto.*;
 import com.assignment.exception.*;
 import com.assignment.model.Parking;
 import com.assignment.model.Ticket;
+import com.assignment.model.enums.CarType;
 import com.assignment.repository.ParkingRepository;
 import com.assignment.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class ParkingService {
      */
     public void initialize(InitParkingDtoIn initParkingDtoIn) {
         Parking parking = initParkingDtoIn.getParking();
-        parking.setId(1);
+        parking.setId(PARKING_ID);
         parkingRepository.save(parking);
     }
 
@@ -52,7 +53,7 @@ public class ParkingService {
             case GASOLINE:
                 if (parking.getGasolineSlots() > 0) {
                     parking.setGasolineSlots(parking.getGasolineSlots() - 1);
-                    checkinDtoOut.setTicket(reserveSlot(parking, checkinDtoIn.getStartHour()));
+                    checkinDtoOut.setTicket(reserveSlot(parking, checkinDtoIn.getStartHour(), GASOLINE));
                 } else {
                     throw new SlotNotFoundException(String.format(SLOT_NOT_FOUND_MSG, GASOLINE.getDescription()));
                 }
@@ -60,7 +61,7 @@ public class ParkingService {
             case ELECTRIC_20:
                 if (parking.getElectric20Slots() > 0) {
                     parking.setElectric20Slots(parking.getElectric20Slots() - 1);
-                    checkinDtoOut.setTicket(reserveSlot(parking, checkinDtoIn.getStartHour()));
+                    checkinDtoOut.setTicket(reserveSlot(parking, checkinDtoIn.getStartHour(), ELECTRIC_20));
                 } else {
                     throw new SlotNotFoundException(String.format(SLOT_NOT_FOUND_MSG, ELECTRIC_20.getDescription()));
                 }
@@ -68,7 +69,7 @@ public class ParkingService {
             case ELECTRIC_50:
                 if (parking.getElectric50Slots() > 0) {
                     parking.setElectric50Slots(parking.getElectric50Slots() - 1);
-                    checkinDtoOut.setTicket(reserveSlot(parking, checkinDtoIn.getStartHour()));
+                    checkinDtoOut.setTicket(reserveSlot(parking, checkinDtoIn.getStartHour(), ELECTRIC_50));
                 } else {
                     throw new SlotNotFoundException(String.format(SLOT_NOT_FOUND_MSG, ELECTRIC_50.getDescription()));
                 }
@@ -84,11 +85,27 @@ public class ParkingService {
      *
      * @param checkoutDtoIn data needed to hundle the exit
      */
-    public void exit(CheckoutDtoIn checkoutDtoIn) throws TicketNotFoundException, FunctionalException {
+    public void exit(CheckoutDtoIn checkoutDtoIn) throws TicketNotFoundException, FunctionalException, ConfigurationNotFoundException {
         Ticket ticket = findTicket(checkoutDtoIn.getTicket());
-        if(ticket.getEndHour() != null) {
+        if (ticket.getEndHour() != null) {
             throw new FunctionalException("Car already exit the parking ! :o");
+        } else if (ticket.getStartHour().isAfter(checkoutDtoIn.getEndHour())) {
+            throw new FunctionalException("End hour can not be after Start hour");
         }
+        Parking parking = findParking(PARKING_ID);
+        // Free parking slot
+        switch (ticket.getCarType()) {
+            case GASOLINE:
+                parking.setGasolineSlots(parking.getGasolineSlots() + 1);
+                break;
+            case ELECTRIC_20:
+                parking.setElectric20Slots(parking.getElectric20Slots() + 1);
+                break;
+            case ELECTRIC_50:
+                parking.setElectric50Slots(parking.getElectric50Slots() + 1);
+                break;
+        }
+        parkingRepository.save(parking);
         ticket.setEndHour(checkoutDtoIn.getEndHour());
         ticketRepository.save(ticket);
     }
@@ -111,9 +128,9 @@ public class ParkingService {
         return billDtoOut;
     }
 
-    private long reserveSlot(Parking parking, LocalDateTime startTime) {
+    private long reserveSlot(Parking parking, LocalDateTime startTime, CarType carType) {
         parkingRepository.save(parking);
-        return ticketRepository.save(new Ticket(startTime)).getNumber();
+        return ticketRepository.save(new Ticket(startTime, carType)).getNumber();
     }
 
     private Ticket findTicket(long number) throws TicketNotFoundException {
